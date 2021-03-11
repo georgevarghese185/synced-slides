@@ -42,6 +42,44 @@ module.exports = {
         }
       );
 
+      await queryInterface.createTable(
+        'displays',
+        {
+          id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true,
+          },
+          name: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+          },
+          loginName: {
+            type: DataTypes.TEXT,
+            unique: true,
+            allowNull: false,
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+          },
+        },
+        {
+          transaction,
+          timestamps: true,
+        }
+      );
+
+      await queryInterface.addIndex('displays', {
+        unique: true,
+        fields: ['loginName'],
+        transaction,
+      });
+
       await transaction.commit();
     } catch (e) {
       await transaction.rollback();
@@ -54,6 +92,7 @@ module.exports = {
 
     try {
       await queryInterface.dropTable('slides');
+      await queryInterface.dropTable('displays');
 
       await transaction.commit();
     } catch (e) {
