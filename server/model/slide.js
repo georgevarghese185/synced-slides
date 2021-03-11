@@ -12,6 +12,7 @@ module.exports = sequelize => {
       unique: true,
       allowNull: false,
     },
+    type: DataTypes.TEXT,
     data: {
       type: DataTypes.BLOB,
       allowNull: false,

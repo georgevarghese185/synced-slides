@@ -1,23 +1,24 @@
-const { slides } = require('../sequelize');
+const db = require('../sequelize');
 const { createHash } = require('crypto');
 const { Router } = require('express');
 const withError = require('./with-error');
 
 const upload = async (req, res) => {
-  const { name, data } = req.body;
+  const { name, data, type } = req.body;
   const dataBuffer = Buffer.from(data, 'base64');
   const etag = createHash('md5').update(dataBuffer).digest();
 
-  const createdSlide = await slides.create({
+  const slide = await db.slides.create({
     name,
+    type,
     data: dataBuffer,
     etag: etag.toString('hex').toUpperCase(),
   });
 
   return res.status(200).json({
-    id: createdSlide.id,
-    name: createdSlide.name,
-    etag: createdSlide.etag,
+    id: slide.id,
+    name: slide.name,
+    etag: slide.etag,
   });
 };
 
