@@ -1,13 +1,14 @@
 const { Sequelize } = require('sequelize');
-const config = require('./config');
-const Slide = require('./model/slide');
+const config = require('../config');
+const Slide = require('./slide');
 
 const sequelize = new Sequelize({
   ...config.db,
 });
 
-const slides = Slide(sequelize);
+const slide = Slide(sequelize);
 
 module.exports = {
-  slides,
+  slide,
+  display,
 };

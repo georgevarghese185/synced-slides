@@ -1,4 +1,4 @@
-const db = require('../sequelize');
+const models = require('../model');
 const { createHash } = require('crypto');
 const { Router } = require('express');
 const withError = require('./with-error');
@@ -11,7 +11,7 @@ const upload = async (req, res) => {
   const dataBuffer = Buffer.from(data, 'base64');
   const etag = createHash('md5').update(dataBuffer).digest();
 
-  const slide = await db.slides.create({
+  const slide = await models.slide.create({
     name,
     type,
     data: dataBuffer,
@@ -26,7 +26,7 @@ const upload = async (req, res) => {
 };
 
 const list = async (req, res) => {
-  const slides = await db.slides.findAll();
+  const slides = await models.slide.findAll();
   res.json({
     slides: slides.map(slide => ({
       id: slide.id,
@@ -46,7 +46,7 @@ const get = async (req, res) => {
     attributes.push('data');
   }
 
-  const slide = await db.slides.findOne({
+  const slide = await models.slide.findOne({
     where: { id },
     attributes,
   });
@@ -62,14 +62,13 @@ const get = async (req, res) => {
 };
 
 const deleteSlide = async (req, res) => {
-  const id = req.params.id;
-  const count = await db.slides.count({ where: { id } });
+  const count = await models.slide.count({ where: { id } });
 
   if (!count) {
     return notFound(res);
   }
 
-  await db.slides.destroy({ where: { id } });
+  await models.slide.destroy({ where: { id } });
   res.json({ message: 'Deleted' });
 };
 
