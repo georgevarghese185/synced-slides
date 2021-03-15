@@ -80,6 +80,42 @@ module.exports = {
         transaction,
       });
 
+      await queryInterface.createTable(
+        'display_slides',
+        {
+          slideId: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+            references: {
+              model: 'slides',
+              key: 'id',
+            },
+          },
+          displayId: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+            references: {
+              model: 'displays',
+              key: 'id',
+            },
+          },
+          createdAt: {
+            type: DataTypes.DATE,
+          },
+          updatedAt: {
+            type: DataTypes.DATE,
+          },
+        },
+        {
+          transaction,
+          timestamps: true,
+        }
+      );
+
       await transaction.commit();
     } catch (e) {
       await transaction.rollback();
@@ -91,6 +127,7 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
 
     try {
+      await queryInterface.dropTable('display_slides');
       await queryInterface.dropTable('slides');
       await queryInterface.dropTable('displays');
 
