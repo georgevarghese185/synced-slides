@@ -11,6 +11,6 @@ const slide = Slide(sequelize);
 const display = Display(sequelize);
 
 module.exports = {
-  slide,
-  display,
+  Slide: slide,
+  Display: display,
 };

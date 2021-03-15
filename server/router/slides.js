@@ -1,4 +1,4 @@
-const models = require('../model');
+const { Slide } = require('../model');
 const { createHash } = require('crypto');
 const { Router } = require('express');
 const withError = require('./with-error');
@@ -17,7 +17,7 @@ const slideExists = async (name, id) => {
     where.id = { [Op.not]: id };
   }
 
-  const count = await models.slide.count({ where });
+  const count = await Slide.count({ where });
   return count !== 0;
 };
 
@@ -40,7 +40,7 @@ const upload = async (req, res) => {
     return duplicate(res);
   }
 
-  const slide = await models.slide.create({
+  const slide = await Slide.create({
     name,
     type,
     data: buffer,
@@ -59,7 +59,7 @@ const update = async (req, res) => {
   const id = parseInt(req.params.id);
   const { name, data, type } = req.body;
 
-  const slide = await models.slide.findOne({ where: { id } });
+  const slide = await Slide.findOne({ where: { id } });
 
   if (!slide) {
     return notFound(res);
@@ -94,7 +94,7 @@ const update = async (req, res) => {
 };
 
 const list = async (req, res) => {
-  const slides = await models.slide.findAll();
+  const slides = await Slide.findAll();
   res.json({
     slides: slides.map(slide => ({
       id: slide.id,
@@ -115,7 +115,7 @@ const get = async (req, res) => {
     attributes.push('data');
   }
 
-  const slide = await models.slide.findOne({
+  const slide = await Slide.findOne({
     where: { id },
     attributes,
   });
@@ -132,13 +132,13 @@ const get = async (req, res) => {
 
 const deleteSlide = async (req, res) => {
   const id = parseInt(req.params.id);
-  const count = await models.slide.count({ where: { id } });
+  const count = await Slide.count({ where: { id } });
 
   if (!count) {
     return notFound(res);
   }
 
-  await models.slide.destroy({ where: { id } });
+  await Slide.destroy({ where: { id } });
   res.json({ message: 'Deleted' });
 };
 
