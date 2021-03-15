@@ -12,6 +12,7 @@ module.exports = sequelize => {
       name: {
         type: DataTypes.TEXT,
         allowNull: false,
+        unique: true,
       },
       loginName: {
         type: DataTypes.TEXT,
