@@ -14,10 +14,7 @@ const getRoutes = async () => {
       meta: { auth },
       children: [
         { path: 'slides', component: () => import('pages/Slides.vue') },
-        {
-          path: ':catchAll(.*)*',
-          redirect: 'slides',
-        }
+        { path: 'slides/new', component: () => import('pages/Slide.vue') },
       ]
     },
     {

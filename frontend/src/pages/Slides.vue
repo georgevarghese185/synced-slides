@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex row">
+  <q-page class="flex row q-pa-md">
     <q-circular-progress
       indeterminate
       v-if="loading"
@@ -21,6 +21,10 @@
         <q-item-section class="text-h4">{{ slide.name }}</q-item-section>
       </q-item>
     </q-list>
+
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn fab icon="add" color="primary" to='/admin/slides/new' />
+    </q-page-sticky>
   </q-page>
 </template>
 
