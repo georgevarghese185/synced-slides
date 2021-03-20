@@ -10,12 +10,14 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-
-        <q-toolbar-title>
-          Quasar App
+        <q-toolbar-title class="q-ml-lg">
+          {{title}}
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn
+          flat
+          label="Logout"
+          @click="logout"
+        />
       </q-toolbar>
     </q-header>
 
@@ -49,6 +51,8 @@
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
+import { defineComponent, ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const linksList = [
   {
@@ -95,7 +99,15 @@ const linksList = [
   }
 ];
 
-import { defineComponent, ref } from 'vue'
+const logout = () => {
+  console.log(`${window.location.protocol}//logout@${window.location.host}`)
+  window.location.href = `${window.location.protocol}//logout@${window.location.host}`;
+}
+
+const getTitle = (route) => () => {
+  const auth = route.meta.auth || {};
+  return auth.isAdmin ? 'Admin' : (auth.display || {}).name || '';
+}
 
 export default defineComponent({
   name: 'MainLayout',
@@ -106,13 +118,17 @@ export default defineComponent({
 
   setup () {
     const leftDrawerOpen = ref(false)
+    const route = useRoute();
+    const title = computed(getTitle(route));
 
     return {
+      title,
       essentialLinks: linksList,
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      },
+      logout
     }
   }
 })

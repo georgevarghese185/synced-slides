@@ -1,19 +1,39 @@
+import * as api from 'src/api';
 
-const routes = [
-  {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/Index.vue') }
-    ]
-  },
+const getRoutes = async () => {
+  const auth = await api.getAuth();
 
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue')
+  if (!auth) {
+    return []
   }
-]
 
-export default routes
+  return auth.isAdmin ? [
+    {
+      path: '/admin',
+      component: () => import('layouts/MainLayout.vue'),
+      meta: { auth },
+      children: [
+        { path: '', component: () => import('pages/Index.vue') }
+      ]
+    },
+    {
+      path: '/:catchAll(.*)*',
+      redirect: '/admin',
+    }
+  ] : [
+    {
+      path: '/display',
+      component: () => import('layouts/MainLayout.vue'),
+      meta: { auth },
+      children: [
+        { path: '', component: () => import('pages/Index.vue') }
+      ]
+    },
+    {
+      path: '/:catchAll(.*)*',
+      redirect: '/display',
+    }
+  ]
+}
+
+export default getRoutes
