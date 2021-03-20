@@ -6,7 +6,7 @@
   "author": "George Varghese M <george@georgevm.com>",
   "private": true,
   "scripts": {
-    "start:dev": "nodemon -w src --exec quasar build",
+    "start:dev": "nodemon -w src --ext js,vue --exec quasar build --debug",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0"
   },
