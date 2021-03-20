@@ -8,6 +8,7 @@ module.exports = {
   env: process.env.NODE_ENV || 'production',
   port: process.env.PORT || 8080,
   serverUrl: process.env.SERVER_URL,
+  password: process.env.PASSWORD,
   db: {
     dialect: 'postgres',
     host: process.env.DB_HOST,
