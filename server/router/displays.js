@@ -104,6 +104,15 @@ const get = async (req, res) => {
   });
 };
 
+const myDisplay = (req, res) => {
+  if (!(req.auth || {}).display) {
+    return notFound(res);
+  }
+
+  req.params.id = req.auth.display.id;
+  return get(req, res);
+};
+
 const update = async (req, res) => {
   const id = req.params.id;
   const { name, loginName, slides } = req.body;
@@ -173,6 +182,7 @@ const deleteDisplay = async (req, res) => {
 const router = Router();
 
 router.get('/', withError(list));
+router.get('/my-display', withError(myDisplay));
 router.post('/new', withError(create));
 router.get('/:id', withError(get));
 router.post('/:id', withError(update));
