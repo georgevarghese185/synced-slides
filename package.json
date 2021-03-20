@@ -4,7 +4,9 @@
   "author": "George Varghese M",
   "license": "UNLICENSE",
   "scripts": {
+    "start": "concurrently \"yarn start:dev\" \"yarn start:frontend:dev\"",
     "start:dev": "nodemon --watch .env --watch server server",
+    "start:frontend:dev": "cd frontend && yarn start:dev",
     "sequelize": "sequelize-cli --config ./sequelize-cli.config.js --migrations-path server/migration",
     "lint": "eslint server/**/*.js"
   },
@@ -21,6 +23,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "concurrently": "^6.0.0",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-config-standard": "^16.0.2",
