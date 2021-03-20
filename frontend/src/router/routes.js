@@ -13,12 +13,16 @@ const getRoutes = async () => {
       component: () => import('layouts/MainLayout.vue'),
       meta: { auth },
       children: [
-        { path: '', component: () => import('pages/Index.vue') }
+        { path: 'slides', component: () => import('pages/Slides.vue') },
+        {
+          path: ':catchAll(.*)*',
+          redirect: 'slides',
+        }
       ]
     },
     {
       path: '/:catchAll(.*)*',
-      redirect: '/admin',
+      redirect: '/admin/slides',
     }
   ] : [
     {
