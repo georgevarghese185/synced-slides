@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { Op } = require('sequelize');
 const { sequelize, Display, Slide } = require('../model');
+const eventManager = require('../event-manager');
 const withError = require('./with-error');
 
 const notFound = res => res.json({ message: 'Display not found' });
@@ -145,6 +146,7 @@ const update = async (req, res) => {
 
   await transaction.commit();
 
+  eventManager.displayUpdate(id);
   return get(req, res);
 };
 
