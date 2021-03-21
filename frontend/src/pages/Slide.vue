@@ -40,8 +40,8 @@
         <q-btn label="Save" type="submit" :loading="uploadLoading" color="primary"/>
         <q-btn
           flat
-          label="Cancel" c
-          olor="primary"
+          label="Cancel"
+          color="primary"
           to="/admin/slides"
           class="q-ml-sm"
           :disable="uploadLoading"
