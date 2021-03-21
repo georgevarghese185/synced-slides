@@ -8,7 +8,7 @@
       class="q-ma-md"
     />
 
-    <q-list v-if="slides" class="col-8">
+    <q-list v-if="slides" class="full-width">
       <q-item
         clickable
         v-ripple
@@ -18,7 +18,7 @@
         <q-item-section thumbnail>
           <img :src="slide.url" class="thumbnail">
         </q-item-section>
-        <q-item-section class="text-h4">{{ slide.name }}</q-item-section>
+        <q-item-section class="text-h6">{{ slide.name }}</q-item-section>
       </q-item>
     </q-list>
 
