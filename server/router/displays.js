@@ -4,10 +4,10 @@ const { sequelize, Display, Slide } = require('../model');
 const eventManager = require('../event-manager');
 const withError = require('./with-error');
 
-const notFound = res => res.json({ message: 'Display not found' });
+const notFound = res => res.status(404).json({ message: 'Display not found' });
 
 const duplicate = res =>
-  res.json({ message: 'A display with that name already exists' });
+  res.status(409).json({ message: 'A display with that name already exists' });
 
 const create = async (req, res) => {
   const { name, loginName, slides } = req.body;
