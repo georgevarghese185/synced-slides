@@ -101,12 +101,33 @@ const list = async (req, res) => {
       name: slide.name,
       type: slide.type,
       etag: slide.etag,
-      url: `${serverUrl}/api/slides/${slide.id}`,
+      url: `${serverUrl}/api/slides/${slide.id}/image`,
     })),
   });
 };
 
 const get = async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const slide = await Slide.findOne({
+    where: { id },
+    attributes: ['id', 'name', 'type', 'etag'],
+  });
+
+  if (!slide) {
+    return notFound(res);
+  }
+
+  return res.json({
+    id: slide.id,
+    name: slide.name,
+    type: slide.type,
+    etag: slide.etag,
+    url: `${serverUrl}/api/slides/${slide.id}/image`,
+  });
+};
+
+const image = async (req, res) => {
   const id = parseInt(req.params.id);
 
   const attributes = ['etag', 'type'];
@@ -146,7 +167,8 @@ const router = Router();
 router.get('/', withError(list));
 router.post('/new', withError(upload));
 router.get('/:id', withError(get));
-router.post('/:id', withError(update));
+router.get('/:id/image', withError(image));
+router.patch('/:id', withError(update));
 router.delete('/:id', withError(deleteSlide));
 
 module.exports = router;
