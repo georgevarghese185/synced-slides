@@ -47,6 +47,12 @@ module.exports = {
         }
       );
 
+      await queryInterface.addIndex('slides', {
+        unique: true,
+        fields: ['uuid'],
+        transaction,
+      });
+
       await queryInterface.createTable(
         'displays',
         {
