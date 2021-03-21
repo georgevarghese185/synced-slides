@@ -1,11 +1,16 @@
 <template>
   <q-page class="flex row q-pa-md">
+    <circular-progress v-if="slideLoading" />
+
+    <p v-if="slideError" class="text-body1 text-red">{{slideError}}</p>
+
     <q-form
       @submit="onSubmit"
       class="q-gutter-md col-5"
       :greedy="true"
+      v-if="!slideLoading"
     >
-      <p class="text-h4 q-mb-xl">New Slide</p>
+      <p class="text-h4 q-mb-md">{{slide ? 'Edit' : 'New'}} Slide</p>
 
       <img v-if="preview" :src="preview" class="preview"/>
 
@@ -15,7 +20,7 @@
         label="Image"
         v-model="image"
         accept="image/*"
-        :rules="[file => !!file]"
+        :rules="[file => !!slide || !!file]"
       >
         <template v-slot:prepend>
           <q-icon name="attach_file" />
@@ -29,17 +34,17 @@
         :rules="[name => !!name]"
       />
 
-      <p v-if="error" class="text-body1 text-red">{{error}}</p>
+      <p v-if="uploadError" class="text-body1 text-red">{{uploadError}}</p>
 
       <div>
-        <q-btn label="Save" type="submit" :loading="loading" color="primary"/>
+        <q-btn label="Save" type="submit" :loading="uploadLoading" color="primary"/>
         <q-btn
           flat
           label="Cancel" c
           olor="primary"
           to="/admin/slides"
           class="q-ml-sm"
-          :disable="loading"
+          :disable="uploadLoading"
         />
       </div>
     </q-form>
@@ -47,53 +52,115 @@
 </template>
 
 <script>
-import { defineComponent, ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { defineComponent, ref, computed, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import * as api from 'src/api'
 import useAsync from 'src/composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
+import CircularProgress from 'src/components/CircularProgress.vue'
+
+const getImageBase64 = async (image) => {
+  const fileReader = new FileReader();
+
+  await new Promise(resolve => {
+    fileReader.onload = resolve;
+    fileReader.readAsDataURL(image);
+  });
+
+  return fileReader.result.replace(`data:${image.type};base64,`, "")
+}
 
 export default defineComponent({
+  components: {
+    CircularProgress
+  },
   setup() {
     const image = ref(null);
     const name = ref(null);
+    const route = useRoute();
     const router = useRouter();
-    const { data, loading, error, doAsync: uploadSlide } = useAsync(api.uploadSlide);
+    const {
+      data: slide,
+      loading: slideLoading,
+      error: slideError,
+      doAsync: getSlide
+    } = useAsync(api.getSlide);
+    const {
+      data: uploadResponse,
+      loading: uploadLoading,
+      error: uploadError,
+      doAsync: uploadSlide
+    } = useAsync(api.uploadSlide);
+    const {
+      data: updateResponse,
+      loading: updateLoading,
+      error: updateError,
+      doAsync: updateSlide
+    } = useAsync(api.updateSlide)
 
     const preview = computed(() => {
       if (image.value) {
         return URL.createObjectURL(image.value);
+      } else if (slide.value && slide.value.url) {
+        return slide.value.url
       } else {
         return null;
       }
     });
 
-    watch(data, () => {
+    const onSubmit = async () => {
+      if (!slide.value) {
+        const type = image.value.type
+        const data = await getImageBase64(image.value)
+        uploadSlide({ name: name.value, type, data })
+      } else {
+        const update = {}
+
+        if (image.value) {
+          update.type = image.value.type
+          update.data = await getImageBase64(image.value)
+        }
+
+        if (name.value) {
+          update.name = name.value
+        }
+
+        updateSlide(slide.value.id, update)
+      }
+    }
+
+    watch(uploadResponse, () => {
       router.push('/admin/slides')
     })
 
-    const onSubmit = async () => {
-      const fileReader = new FileReader();
+    watch(updateResponse, () => {
+      router.push('/admin/slides')
+    })
 
-      await new Promise(resolve => {
-        fileReader.onload = resolve;
-        fileReader.readAsDataURL(image.value);
-      });
+    watch(slide, () => {
+      if (slide.value) {
+        name.value = slide.value.name
+      }
+    })
 
-      const type = image.value.type
-      const data = fileReader.result.replace(`data:${type};base64,`, "")
-
-      uploadSlide({ name: name.value, type, data })
-    }
+    onMounted(() => {
+      if (route.params.id) {
+        getSlide(route.params.id)
+      }
+    })
 
     return {
       image,
       name,
       preview,
       onSubmit,
-      data,
-      loading,
-      error: useErrorMessage(error)
+      slide,
+      slideLoading,
+      slideError: useErrorMessage(slideError),
+      uploadLoading,
+      uploadError: useErrorMessage(uploadError),
+      updateLoading,
+      updateError: useErrorMessage(updateError),
     }
   },
 })

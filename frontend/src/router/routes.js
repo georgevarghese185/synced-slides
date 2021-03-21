@@ -15,6 +15,7 @@ const getRoutes = async () => {
       children: [
         { path: 'slides', component: () => import('pages/Slides.vue') },
         { path: 'slides/new', component: () => import('pages/Slide.vue') },
+        { path: 'slides/:id', component: () => import('pages/Slide.vue') },
       ]
     },
     {

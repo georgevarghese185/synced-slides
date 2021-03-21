@@ -43,6 +43,7 @@
 
 <script>
 import { defineComponent, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import * as api from '../api'
 import useAsync from '../composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
@@ -53,6 +54,7 @@ export default defineComponent({
     CircularProgress,
   },
   setup() {
+    const router = useRouter()
     const {
       data: slides,
       loading,
@@ -66,8 +68,8 @@ export default defineComponent({
     } = useAsync(api.deleteSlide);
     const deletingSlide = ref(null)
 
-    const onClick = (slide, e) => {
-
+    const onClick = (slide) => {
+      router.push(`/admin/slides/${slide.id}`)
     }
 
     const onDelete = (slide, e) => {
