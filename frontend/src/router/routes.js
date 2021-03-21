@@ -16,6 +16,9 @@ const getRoutes = async () => {
         { path: 'slides', component: () => import('pages/Slides.vue') },
         { path: 'slides/new', component: () => import('pages/Slide.vue') },
         { path: 'slides/:id', component: () => import('pages/Slide.vue') },
+        { path: 'displays', component: () => import('pages/Displays.vue') },
+        { path: 'displays/new', component: () => import('pages/Display.vue') },
+        { path: 'displays/:id', component: () => import('pages/Display.vue') },
       ]
     },
     {
