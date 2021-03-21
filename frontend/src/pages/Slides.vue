@@ -1,12 +1,6 @@
 <template>
-  <q-page class="flex row q-pa-md">
-    <q-circular-progress
-      indeterminate
-      v-if="loading"
-      size="50px"
-      color="primary"
-      class="q-ma-md"
-    />
+  <q-page class="flex row q-pa-md position-relative">
+    <circular-progress v-if="loading" />
 
     <p v-if="error" class="text-body1 text-red">{{error}}</p>
 
@@ -52,8 +46,12 @@ import { defineComponent, onMounted, ref, watch } from 'vue'
 import * as api from '../api'
 import useAsync from '../composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
+import CircularProgress from 'src/components/CircularProgress.vue'
 
 export default defineComponent({
+  components: {
+    CircularProgress,
+  },
   setup() {
     const {
       data: slides,
