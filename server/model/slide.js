@@ -7,6 +7,11 @@ module.exports = sequelize => {
       autoIncrement: true,
       primaryKey: true,
     },
+    uuid: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      unique: true,
+    },
     name: {
       type: DataTypes.TEXT,
       unique: true,

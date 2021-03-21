@@ -4,6 +4,7 @@ const { Router } = require('express');
 const withError = require('./with-error');
 const { serverUrl } = require('../config');
 const { Op } = require('sequelize');
+const { v4: uuidv4 } = require('uuid');
 
 const notFound = res => res.status(400).send({ message: 'Slide not found' });
 
@@ -19,6 +20,10 @@ const slideExists = async (name, id) => {
 
   const count = await Slide.count({ where });
   return count !== 0;
+};
+
+const slideUrl = slide => {
+  return `${serverUrl}/api/slides/image/${slide.uuid}`;
 };
 
 const decodeData = data => {
@@ -41,6 +46,7 @@ const upload = async (req, res) => {
   }
 
   const slide = await Slide.create({
+    uuid: uuidv4(),
     name,
     type,
     data: buffer,
@@ -52,6 +58,7 @@ const upload = async (req, res) => {
     type: slide.type,
     name: slide.name,
     etag: slide.etag,
+    url: slideUrl(slide),
   });
 };
 
@@ -77,6 +84,7 @@ const update = async (req, res) => {
     const { buffer, etag } = decodeData(data);
     slide.data = buffer;
     slide.etag = etag;
+    slide.uuid = uuidv4();
   }
 
   if (type) {
@@ -90,13 +98,14 @@ const update = async (req, res) => {
     type: slide.type,
     name: slide.name,
     etag: slide.etag,
+    url: slideUrl(slide),
   });
 };
 
 const list = async (req, res) => {
   const slides = await Slide.findAll({
     order: [['name']],
-    attributes: ['id', 'name', 'type', 'etag'],
+    attributes: ['id', 'uuid', 'name', 'type', 'etag'],
   });
   res.json({
     slides: slides.map(slide => ({
@@ -104,7 +113,7 @@ const list = async (req, res) => {
       name: slide.name,
       type: slide.type,
       etag: slide.etag,
-      url: `${serverUrl}/api/slides/${slide.id}/image`,
+      url: slideUrl(slide),
     })),
   });
 };
@@ -114,7 +123,7 @@ const get = async (req, res) => {
 
   const slide = await Slide.findOne({
     where: { id },
-    attributes: ['id', 'name', 'type', 'etag'],
+    attributes: ['id', 'uuid', 'name', 'type', 'etag'],
   });
 
   if (!slide) {
@@ -126,12 +135,12 @@ const get = async (req, res) => {
     name: slide.name,
     type: slide.type,
     etag: slide.etag,
-    url: `${serverUrl}/api/slides/${slide.id}/image`,
+    url: slideUrl(slide),
   });
 };
 
 const image = async (req, res) => {
-  const id = parseInt(req.params.id);
+  const uuid = req.params.uuid;
 
   const attributes = ['etag', 'type'];
 
@@ -140,7 +149,7 @@ const image = async (req, res) => {
   }
 
   const slide = await Slide.findOne({
-    where: { id },
+    where: { uuid },
     attributes,
   });
 
@@ -170,7 +179,7 @@ const router = Router();
 router.get('/', withError(list));
 router.post('/new', withError(upload));
 router.get('/:id', withError(get));
-router.get('/:id/image', withError(image));
+router.get('/image/:uuid', withError(image));
 router.patch('/:id', withError(update));
 router.delete('/:id', withError(deleteSlide));
 
