@@ -94,7 +94,10 @@ const update = async (req, res) => {
 };
 
 const list = async (req, res) => {
-  const slides = await Slide.findAll();
+  const slides = await Slide.findAll({
+    order: [['name']],
+    attributes: ['id', 'name', 'type', 'etag'],
+  });
   res.json({
     slides: slides.map(slide => ({
       id: slide.id,
