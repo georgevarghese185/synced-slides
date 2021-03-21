@@ -9,7 +9,7 @@ const createSocket = require('./socket');
 const authenticate = require('./middleware/authenticate');
 const httpServer = require('http').createServer(app);
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(requestLogger());
 
 app.use(authenticate);
