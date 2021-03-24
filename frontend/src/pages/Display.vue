@@ -1,5 +1,9 @@
 <template>
   <q-page class="flex row q-pa-md">
+    <circular-progress v-if="displayLoading" />
+
+    <p v-if="displayError" class="text-body1 text-red">{{displayError}}</p>
+
     <q-form
       @submit="onSubmit"
       class="q-gutter-md col-5"
@@ -24,6 +28,21 @@
 
       <p v-if="createError" class="text-body1 text-red">{{createError}}</p>
 
+      <div class="row q-mb-md">
+        <p class="text-h4 q-ma-none">Slides</p>
+        <q-btn flat color="grey" icon="edit" @click="editSlides" />
+      </div>
+
+      <slide-list :deletable="false" :slides="slides || []" />
+
+      <q-dialog v-model="slidesDialogVisible">
+        <slides-selector
+          class="full-width slides-dialog"
+          v-model="slides"
+          @close="slidesDialogVisible = false"
+        />
+      </q-dialog>
+
       <div>
         <q-btn label="Save" type="submit" :loading="createLoading" color="primary"/>
         <q-btn
@@ -46,11 +65,16 @@ import * as api from 'src/api'
 import useAsync from 'src/composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
 import CircularProgress from 'src/components/CircularProgress.vue'
+import SlidesSelector from 'src/components/SlidesSelector.vue'
+import SlideList from 'src/components/SlideList.vue'
 
 export default defineComponent({
+  components: { SlidesSelector, SlideList, CircularProgress },
   setup() {
     const name = ref(null);
     const loginName = ref(null);
+    const slides = ref(null);
+    const slidesDialogVisible = ref(false)
     const route = useRoute();
     const router = useRouter();
     const {
@@ -70,8 +94,12 @@ export default defineComponent({
       createDisplay({
         name: name.value,
         loginName: loginName.value,
-        slides: []
+        slides: slides.value.map(slide => slide.id)
       })
+    }
+
+    const editSlides = () => {
+      slidesDialogVisible.value = true
     }
 
     watch(createResponse, () => {
@@ -82,6 +110,7 @@ export default defineComponent({
       if (display.value) {
         name.value = display.value.name
         loginName.value = display.value.loginName
+        slides.value = display.value.slides
       }
     })
 
@@ -94,13 +123,22 @@ export default defineComponent({
     return {
       name,
       loginName,
+      slides,
       onSubmit,
       display,
       displayLoading,
       displayError: useErrorMessage(displayError),
       createLoading,
       createError: useErrorMessage(createError),
+      slidesDialogVisible,
+      editSlides,
     }
   },
 })
 </script>
+
+<style scoped>
+  .slides-dialog {
+    max-width: none;
+  }
+</style>
