@@ -19,3 +19,8 @@ export const createDisplay = async ({ name, loginName, slides }) => {
   const response = await axios.post('/displays/new', { name, loginName, slides });
   return response.data;
 }
+
+export const updateDisplay = async (id, update) => {
+  const response = await axios.post(`/displays/${id}`, update);
+  return response.data.displays;
+}

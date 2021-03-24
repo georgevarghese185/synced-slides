@@ -44,14 +44,14 @@
       </q-dialog>
 
       <div>
-        <q-btn label="Save" type="submit" :loading="createLoading" color="primary"/>
+        <q-btn label="Save" type="submit" :loading="createLoading || updateLoading" color="primary"/>
         <q-btn
           flat
           label="Cancel"
           color="primary"
           to="/admin/displays"
           class="q-ml-sm"
-          :disable="createLoading"
+          :disable="createLoading || updateLoading"
         />
       </div>
     </q-form>
@@ -89,13 +89,37 @@ export default defineComponent({
       error: createError,
       doAsync: createDisplay
     } = useAsync(api.createDisplay);
+    const {
+      data: updateResponse,
+      loading: updateLoading,
+      error: updateError,
+      doAsync: updateDisplay
+    } = useAsync(api.updateDisplay)
 
     const onSubmit = async () => {
-      createDisplay({
-        name: name.value,
-        loginName: loginName.value,
-        slides: slides.value.map(slide => slide.id)
-      })
+      if (!display.value) {
+        createDisplay({
+          name: name.value,
+          loginName: loginName.value,
+          slides: (slides.value || []).map(slide => slide.id)
+        })
+      } else {
+        const update = {}
+
+        if (loginName.value) {
+          update.loginName = loginName.value
+        }
+
+        if (name.value) {
+          update.name = name.value
+        }
+
+        if (slides.value) {
+          update.slides = slides.value.map(slide => slide.id)
+        }
+
+        updateDisplay(display.value.id, update)
+      }
     }
 
     const editSlides = () => {
@@ -103,6 +127,10 @@ export default defineComponent({
     }
 
     watch(createResponse, () => {
+      router.push('/admin/displays')
+    })
+
+    watch(updateResponse, () => {
       router.push('/admin/displays')
     })
 
@@ -132,6 +160,8 @@ export default defineComponent({
       createError: useErrorMessage(createError),
       slidesDialogVisible,
       editSlides,
+      updateLoading,
+      updateError: useErrorMessage(updateError)
     }
   },
 })
