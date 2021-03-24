@@ -9,7 +9,7 @@
       <slide-list
         v-if="allSlides"
         :deletable="false"
-        :slides="allSlides.filter(slide => selectedSlides.indexOf(slide) === -1)"
+        :slides="allSlides.filter(slide => !selectedSlides.find(s => s.id === slide.id))"
         @click="onSelect"
       />
     </div>
