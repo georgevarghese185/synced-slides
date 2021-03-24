@@ -19,11 +19,12 @@ const getRoutes = async () => {
         { path: 'displays', component: () => import('pages/Displays.vue') },
         { path: 'displays/new', component: () => import('pages/Display.vue') },
         { path: 'displays/:id', component: () => import('pages/Display.vue') },
+        { path: 'presentation', component: () => import('pages/PresentationControl') }
       ]
     },
     {
       path: '/:catchAll(.*)*',
-      redirect: '/admin/slides',
+      redirect: '/admin/presentation',
     }
   ] : [
     {
