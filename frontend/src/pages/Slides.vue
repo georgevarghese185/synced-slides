@@ -11,29 +11,15 @@
       No Slides
     </p>
 
-    <q-list v-if="slides" class="full-width">
-      <q-item
-        clickable
-        v-ripple
-        v-for="slide in slides"
-        :key="slide.id"
-        @click="onClick(slide)"
-      >
-        <q-item-section thumbnail>
-          <img :src="slide.url" class="thumbnail">
-        </q-item-section>
-        <q-item-section class="text-h6">{{ slide.name }}</q-item-section>
-        <div class="column justify-center">
-          <q-btn
-            flat
-            color="red"
-            icon="delete"
-            :loading="deleteLoading && deletingSlide === slide.id"
-            @click="onDelete(slide, $event)"
-          />
-        </div>
-      </q-item>
-    </q-list>
+    <slide-list
+      class="full-width"
+      v-if="slides"
+      :deletable="true"
+      :deletingId="deletingSlide"
+      :slides="slides"
+      @click="onClick"
+      @delete="onDelete"
+    />
 
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab icon="add" color="primary" to='/admin/slides/new' />
@@ -48,10 +34,12 @@ import * as api from '../api'
 import useAsync from '../composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
 import CircularProgress from 'src/components/CircularProgress.vue'
+import SlideList from 'src/components/SlideList.vue'
 
 export default defineComponent({
   components: {
     CircularProgress,
+    SlideList,
   },
   setup() {
     const router = useRouter()
@@ -72,8 +60,7 @@ export default defineComponent({
       router.push(`/admin/slides/${slide.id}`)
     }
 
-    const onDelete = (slide, e) => {
-      e.stopPropagation()
+    const onDelete = (slide) => {
       deletingSlide.value = slide.id
       deleteSlide(slide.id)
     }
@@ -93,10 +80,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style scoped>
-  .thumbnail {
-    width: auto;
-    height: 200px;
-  }
-</style>
