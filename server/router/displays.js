@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 const { sequelize, Display, Slide } = require('../model');
 const eventManager = require('../event-manager');
 const withError = require('./with-error');
+const { slideUrl } = require('../util/slide');
 
 const notFound = res => res.status(404).json({ message: 'Display not found' });
 
@@ -51,6 +52,8 @@ const create = async (req, res) => {
       id: slide.id,
       name: slide.name,
       type: slide.type,
+      etag: slide.etag,
+      url: slideUrl(slide),
     })),
   });
 };
@@ -59,7 +62,7 @@ const list = async (req, res) => {
   const displays = await Display.findAll({
     include: {
       model: Slide,
-      attributes: ['id', 'name', 'type'],
+      attributes: ['id', 'name', 'type', 'uuid'],
     },
   });
 
@@ -72,6 +75,8 @@ const list = async (req, res) => {
         id: slide.id,
         name: slide.name,
         type: slide.type,
+        etag: slide.etag,
+        url: slideUrl(slide),
       })),
     })),
   });
@@ -84,7 +89,7 @@ const get = async (req, res) => {
     where: { id },
     include: {
       model: Slide,
-      attributes: ['id', 'name', 'type'],
+      attributes: ['id', 'name', 'type', 'uuid'],
     },
   });
 
@@ -100,6 +105,8 @@ const get = async (req, res) => {
       id: slide.id,
       name: slide.name,
       type: slide.type,
+      etag: slide.etag,
+      url: slideUrl(slide),
     })),
   });
 };
@@ -121,7 +128,7 @@ const update = async (req, res) => {
     where: { id },
     include: {
       model: Slide,
-      attributes: ['id', 'name', 'type'],
+      attributes: ['id', 'name', 'type', 'uuid'],
     },
   });
 
@@ -164,10 +171,6 @@ const deleteDisplay = async (req, res) => {
 
   const display = await Display.findOne({
     where: { id },
-    include: {
-      model: Slide,
-      attributes: ['id', 'name', 'type'],
-    },
   });
 
   if (!display) {

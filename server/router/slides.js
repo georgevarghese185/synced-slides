@@ -5,6 +5,7 @@ const withError = require('./with-error');
 const { serverUrl } = require('../config');
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
+const { slideUrl } = require('../util/slide');
 
 const notFound = res => res.status(400).send({ message: 'Slide not found' });
 
@@ -20,10 +21,6 @@ const slideExists = async (name, id) => {
 
   const count = await Slide.count({ where });
   return count !== 0;
-};
-
-const slideUrl = slide => {
-  return `${serverUrl}/api/slides/image/${slide.uuid}`;
 };
 
 const decodeData = data => {
