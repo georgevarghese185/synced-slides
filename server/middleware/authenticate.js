@@ -2,17 +2,24 @@ const config = require('../config');
 const { Display } = require('../model');
 const logger = require('../util/logger');
 
-const unauthorized = res => {
-  res.status(401).set('WWW-Authenticate', 'Basic').send('Please login');
+const unauthorized = (res, next) => {
+  if (res) {
+    return res
+      .status(401)
+      .set('WWW-Authenticate', 'Basic')
+      .send('Please login');
+  } else {
+    next(new Error('Unauthorized'));
+  }
 };
 
 const authenticate = async (req, res, next) => {
   logger.info('Authenticating request');
-  const authorization = req.headers.authorization;
+  const authorization = (req.headers || req.handshake.headers).authorization;
 
   if (!authorization) {
     logger.info('No authorization header. Rejecting');
-    return unauthorized(res);
+    return unauthorized(res, next);
   }
 
   try {
@@ -23,7 +30,7 @@ const authenticate = async (req, res, next) => {
 
     if (password !== config.password) {
       logger.info('Invalid password. Rejecting');
-      return unauthorized(res);
+      return unauthorized(res, next);
     }
 
     if (username === 'admin') {
@@ -35,7 +42,7 @@ const authenticate = async (req, res, next) => {
 
       if (!display) {
         logger.info('Unknown display name. Rejecting');
-        return unauthorized(res);
+        return unauthorized(res, next);
       }
 
       logger.info(`Request from dispay ${display.name}`);
@@ -46,7 +53,7 @@ const authenticate = async (req, res, next) => {
   } catch (e) {
     logger.error(e);
     logger.info('Error in authentication. Rejecting');
-    return unauthorized(res);
+    return unauthorized(res, next);
   }
 };
 

@@ -1,8 +1,7 @@
 const socketio = require('socket.io');
-const { Display } = require('./model');
 const logger = require('./util/logger');
 const eventManager = require('./event-manager');
-const config = require('./config');
+const authenticate = require('./middleware/authenticate')
 
 const SOCKET_EVENT_QUERY_SLIDE = 'querySlide';
 const SOCKET_EVENT_SLIDE_CHANGE = 'slideChange';
@@ -29,31 +28,6 @@ const addDisplaySocket = (displayId, socket) => {
       s => s !== socket
     );
   });
-};
-
-const authenticate = async socket => {
-  logger.info(`Authenticating connection`);
-  const auth = socket.handshake.auth || {};
-  const username = auth.username;
-  const password = auth.password;
-
-  if (password !== config.password) {
-    logger.info(`Invalid password`);
-    return null;
-  }
-
-  if (username === 'admin') {
-    return { isAdmin: true };
-  }
-
-  const display = await Display.findOne({ where: { loginName: username } });
-
-  if (!display) {
-    logger.info(`Display not found`);
-    return null;
-  }
-
-  return { isAdmin: false, display };
 };
 
 const onQuerySlide = callback => {
@@ -83,7 +57,7 @@ const onDisplayUpdate = displayId => {
 
 const onConnection = async socket => {
   logger.info('New connection');
-  const auth = await authenticate(socket);
+  const auth = socket.request.auth;
 
   if (!auth) {
     logger.info('Could not authenticate connection. Rejecting');
@@ -107,6 +81,9 @@ const onConnection = async socket => {
 
 const createSocket = httpServer => {
   const io = socketio(httpServer);
+  io.use((socket, next) => {
+    authenticate(socket.request, null, next);
+  });
   io.on('connection', onConnection);
 
   eventManager.onSlideChange(onSlideChange(io));
