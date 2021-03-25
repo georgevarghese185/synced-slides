@@ -5,6 +5,11 @@ export const getDisplays = async () => {
   return response.data.displays;
 }
 
+export const getMyDisplay = async () => {
+  const response = await axios.get('/displays/my-display');
+  return response.data
+}
+
 export const getDisplay = async (id) => {
   const response = await axios.get(`/displays/${id}`);
   return response.data;

@@ -19,7 +19,7 @@ const getRoutes = async () => {
         { path: 'displays', component: () => import('pages/Displays.vue') },
         { path: 'displays/new', component: () => import('pages/Display.vue') },
         { path: 'displays/:id', component: () => import('pages/Display.vue') },
-        { path: 'presentation', component: () => import('pages/PresentationControl') }
+        { path: 'presentation', component: () => import('pages/PresentationControl.vue') }
       ]
     },
     {
@@ -28,16 +28,12 @@ const getRoutes = async () => {
     }
   ] : [
     {
-      path: '/display',
-      component: () => import('layouts/MainLayout.vue'),
-      meta: { auth },
-      children: [
-        { path: '', component: () => import('pages/Index.vue') }
-      ]
+      path: '/display/presentation',
+      component: () => import('pages/Presentation.vue')
     },
     {
       path: '/:catchAll(.*)*',
-      redirect: '/display',
+      redirect: '/display/presentation',
     }
   ]
 }
