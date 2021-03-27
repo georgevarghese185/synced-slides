@@ -12,18 +12,24 @@
       />
     </div>
 
-    <img
+    <div
       v-if="presenting && connected && slideNumber != null"
-      :src="display.slides[slideNumber].url"
-      class="slide"
-    />
+      class="absolute-full"
+    >
+      <img
+        v-for="slide in slides"
+        :key="slide.id"
+        :src="slide.url"
+        :class="slideClass(slide)"
+      />
+    </div>
   </q-page>
 </template>
 
 <script>
 import useAsync from 'src/composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue'
+import { defineComponent, onMounted, onUnmounted, ref, computed } from 'vue'
 import * as api from 'src/api'
 import CircularProgress from 'src/components/CircularProgress.vue'
 import useSocket from 'src/composables/use-socket'
@@ -32,17 +38,31 @@ export default defineComponent({
   components: { CircularProgress },
   setup() {
     const presenting = ref(false)
+
     const {
       data: display,
       loading,
       error,
       doAsync: getMyDisplay
     } = useAsync(api.getMyDisplay)
+
     const {
       connected,
       connectionError,
       slideNumber,
     } = useSocket(getMyDisplay);
+
+    const slides = computed(() => {
+      if (!display.value && !connected.value) {
+        return [];
+      }
+
+      return [
+        display.value.slides[slideNumber.value - 1],
+        display.value.slides[slideNumber.value],
+        display.value.slides[slideNumber.value + 1]
+      ].filter(slide => !!slide)
+    })
 
     const onFullscreenChange = () => {
       if (document.fullscreenElement == null) {
@@ -54,6 +74,16 @@ export default defineComponent({
     const startPresentation = async () => {
       presenting.value = true
       // document.querySelector('#q-app').requestFullscreen();
+    }
+
+    const slideClass = (slide) => {
+      const index = display.value.slides.findIndex(s => s.id === slide.id)
+      return {
+        slide: true,
+        'absolute-full': true,
+        'slide-previous': index < slideNumber.value,
+        'slide-next': index > slideNumber.value
+      }
     }
 
     onMounted(() => {
@@ -68,12 +98,14 @@ export default defineComponent({
     return {
       connected,
       connectionError,
+      slides,
       slideNumber,
       presenting,
       display,
       loading,
       error: useErrorMessage(error),
-      startPresentation
+      startPresentation,
+      slideClass
     }
   },
 })
@@ -84,5 +116,14 @@ export default defineComponent({
     height: 100%;
     width: 100%;
     object-fit: contain;
+    transition: transform 1s ease;
+  }
+
+  .slide-previous {
+    transform: translate(-100%, 0);
+  }
+
+  .slide-next {
+    transform: translate(100%, 0);
   }
 </style>
