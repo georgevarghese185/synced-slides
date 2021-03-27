@@ -6,4 +6,4 @@ const slideUrl = slide => {
 
 module.exports = {
   slideUrl,
-}
+};

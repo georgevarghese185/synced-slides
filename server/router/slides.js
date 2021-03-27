@@ -2,7 +2,6 @@ const { Slide } = require('../model');
 const { createHash } = require('crypto');
 const { Router } = require('express');
 const withError = require('./with-error');
-const { serverUrl } = require('../config');
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const { slideUrl } = require('../util/slide');
