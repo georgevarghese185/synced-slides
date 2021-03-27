@@ -11,6 +11,7 @@ const getRoutes = async () => {
     {
       path: '/admin',
       component: () => import('layouts/MainLayout.vue'),
+      props: { drawer: true },
       meta: { auth },
       children: [
         { path: 'slides', component: () => import('pages/Slides.vue') },
@@ -28,8 +29,12 @@ const getRoutes = async () => {
     }
   ] : [
     {
-      path: '/display/presentation',
-      component: () => import('pages/Presentation.vue')
+      path: '/display',
+      component: () => import('layouts/MainLayout.vue'),
+      params: { drawer: false },
+      children: [
+        { path: 'presentation', component: () => import('pages/Presentation.vue') }
+      ]
     },
     {
       path: '/:catchAll(.*)*',

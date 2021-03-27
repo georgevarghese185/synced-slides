@@ -3,6 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn
+        v-if="drawer"
           flat
           dense
           round
@@ -22,6 +23,7 @@
     </q-header>
 
     <q-drawer
+      v-if="drawer"
       v-model="leftDrawerOpen"
       show-if-above
       bordered
@@ -87,8 +89,8 @@ const getTitle = (route) => () => {
 
 export default defineComponent({
   name: 'MainLayout',
-
-  setup () {
+  props: ['drawer'],
+  setup (props) {
     const leftDrawerOpen = ref(false)
     const route = useRoute();
     const title = computed(getTitle(route));

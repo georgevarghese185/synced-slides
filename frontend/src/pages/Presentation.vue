@@ -1,5 +1,5 @@
 <template>
-  <div class="fullscreen column items-center justify-center">
+  <q-page class="flex column items-center justify-center">
     <div v-if="!presenting">
       <circular-progress v-if="loading" />
       <p v-if="error" class="text-body1 text-red">{{error}}</p>
@@ -17,7 +17,7 @@
       :src="display.slides[slideNumber].url"
       class="slide"
     />
-  </div>
+  </q-page>
 </template>
 
 <script>
