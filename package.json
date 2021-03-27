@@ -6,6 +6,7 @@
   "scripts": {
     "start": "concurrently \"yarn start:dev\" \"yarn start:frontend:dev\"",
     "start:dev": "nodemon --watch .env --watch server server",
+    "start:prod": "node server",
     "start:frontend:dev": "cd frontend && yarn start:dev",
     "sequelize": "sequelize-cli --config ./sequelize-cli.config.js --migrations-path server/migration",
     "lint": "eslint server/**/*.js"
