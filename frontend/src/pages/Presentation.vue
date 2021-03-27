@@ -15,6 +15,7 @@
     </div>
 
     <div
+      id="presentation"
       v-if="presenting && connected && slideNumber != null"
       class="absolute-full"
     >
@@ -31,7 +32,7 @@
 <script>
 import useAsync from 'src/composables/use-async'
 import useErrorMessage from 'src/composables/use-error-message'
-import { defineComponent, onMounted, onUnmounted, ref, computed } from 'vue'
+import { defineComponent, onMounted, onUnmounted, ref, computed, nextTick } from 'vue'
 import * as api from 'src/api'
 import CircularProgress from 'src/components/CircularProgress.vue'
 import useSocket from 'src/composables/use-socket'
@@ -75,7 +76,9 @@ export default defineComponent({
 
     const startPresentation = async () => {
       presenting.value = true
-      // document.querySelector('#q-app').requestFullscreen();
+      nextTick(() => {
+        document.querySelector('#presentation').requestFullscreen();
+      })
     }
 
     const slideClass = (slide) => {
