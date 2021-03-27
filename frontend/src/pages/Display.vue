@@ -6,13 +6,14 @@
 
     <q-form
       @submit="onSubmit"
-      class="q-gutter-md col-5"
+      class="q-gutter-md full-width"
       :greedy="true"
-      v-if="!displayLoading"
+      v-if="!displayLoading && !displayError"
     >
       <p class="text-h4 q-mb-md">{{display ? 'Edit' : 'New'}} Display</p>
 
       <q-input
+        style="width: 40%"
         outlined
         v-model="name"
         label="Display Name"
@@ -20,13 +21,13 @@
       />
 
       <q-input
+        style="width: 40%"
         outlined
         v-model="loginName"
         label="Login Name"
         :rules="[loginName => !!loginName]"
       />
 
-      <p v-if="createError" class="text-body1 text-red">{{createError}}</p>
 
       <div class="row q-mb-md">
         <p class="text-h4 q-ma-none">Slides</p>
@@ -42,6 +43,8 @@
           @close="slidesDialogVisible = false"
         />
       </q-dialog>
+
+      <p v-if="createError" class="text-body1 text-red">{{createError}}</p>
 
       <div>
         <q-btn label="Save" type="submit" :loading="createLoading || updateLoading" color="primary"/>
