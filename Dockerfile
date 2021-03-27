@@ -20,4 +20,4 @@ COPY --from=builder /app/build .
 
 EXPOSE 80
 ENV PORT=80
-CMD sh -c "yarn start:prod"
+CMD sh -c "yarn sequelize db:migrate && yarn start:prod"
