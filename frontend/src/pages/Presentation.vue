@@ -1,11 +1,13 @@
 <template>
   <q-page class="flex column items-center justify-center">
+
     <div v-if="!presenting">
       <circular-progress v-if="loading" />
+      <p v-if="connectionError" class="text-body1 text-red">Connection error: {{connectionError}}</p>
       <p v-if="error" class="text-body1 text-red">{{error}}</p>
       <p v-if="display" class="text-h3">{{display.name}}</p>
       <q-btn
-        v-if="display"
+        :disable="!display || !connected"
         label="Start Presentation"
         color="primary"
         @click="startPresentation"
