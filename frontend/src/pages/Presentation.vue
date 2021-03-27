@@ -82,6 +82,7 @@ export default defineComponent({
 <style scoped>
   .slide {
     height: 100%;
-    width: auto;
+    width: 100%;
+    object-fit: contain;
   }
 </style>
