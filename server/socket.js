@@ -1,7 +1,7 @@
 const socketio = require('socket.io');
 const logger = require('./util/logger');
 const eventManager = require('./event-manager');
-const authenticate = require('./middleware/authenticate')
+const authenticate = require('./middleware/authenticate');
 
 const SOCKET_EVENT_QUERY_SLIDE = 'querySlide';
 const SOCKET_EVENT_SLIDE_CHANGE = 'slideChange';
@@ -11,6 +11,25 @@ const SOCKET_EVENT_READY = 'ready';
 
 let adminSockets = [];
 const displaySockets = {};
+
+const isConnected = socket => {
+  if (!socket.connected) {
+    logger.warn('Stale socket still in cache. Removing');
+    return false;
+  }
+
+  return true;
+};
+
+const socketCleanup = () => {
+  logger.info('Looking for stale cached sockets to delete');
+
+  adminSockets = adminSockets.filter(isConnected);
+
+  for (const displayId in displaySockets) {
+    displaySockets[displayId] = displaySockets[displayId].filter(isConnected);
+  }
+};
 
 const addAdminSocket = socket => {
   adminSockets.push(socket);
@@ -88,6 +107,8 @@ const createSocket = httpServer => {
 
   eventManager.onSlideChange(onSlideChange(io));
   eventManager.onDisplayUpdate(onDisplayUpdate);
+
+  setInterval(socketCleanup, 60 * 60 * 1000);
 };
 
 module.exports = createSocket;
