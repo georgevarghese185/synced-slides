@@ -139,9 +139,9 @@ module.exports = {
     const transaction = await queryInterface.sequelize.transaction();
 
     try {
-      await queryInterface.dropTable('display_slides');
-      await queryInterface.dropTable('slides');
-      await queryInterface.dropTable('displays');
+      await queryInterface.dropTable('display_slides', { transaction });
+      await queryInterface.dropTable('slides', { transaction });
+      await queryInterface.dropTable('displays', { transaction });
 
       await transaction.commit();
     } catch (e) {
