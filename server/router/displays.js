@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { Op } = require('sequelize');
-const { sequelize, Display, Slide } = require('../model');
+const { sequelize, Display, Slide, DisplaySlide } = require('../model');
 const eventManager = require('../event-manager');
 const withError = require('./with-error');
 const { slideUrl } = require('../util/slide');
@@ -9,6 +9,15 @@ const notFound = res => res.status(404).json({ message: 'Display not found' });
 
 const duplicate = res =>
   res.status(409).json({ message: 'A display with that name already exists' });
+
+const setSlides = async (displayId, slideIds, options) => {
+  const entries = slideIds.map((slideId, index) => ({
+    displayId,
+    slideId,
+    sequence: index,
+  }));
+  await DisplaySlide.bulkCreate(entries, options);
+};
 
 const create = async (req, res) => {
   const { name, loginName, slides } = req.body;
@@ -32,7 +41,7 @@ const create = async (req, res) => {
     { transaction }
   );
 
-  await display.addSlides(slides, { transaction, timestamps: true });
+  await setSlides(display.id, slides, { transaction });
 
   await transaction.commit();
 
@@ -91,6 +100,7 @@ const get = async (req, res) => {
       model: Slide,
       attributes: ['id', 'name', 'type', 'uuid'],
     },
+    order: [[Slide, DisplaySlide, 'sequence']],
   });
 
   if (!display) {
@@ -155,7 +165,8 @@ const update = async (req, res) => {
   }
 
   if (slides) {
-    await display.setSlides(slides, { transaction });
+    await display.setSlides([], { transaction });
+    await setSlides(id, slides, { transaction });
   }
 
   await display.save({ transaction });

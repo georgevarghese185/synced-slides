@@ -24,6 +24,10 @@ module.exports = sequelize => {
           key: 'id',
         },
       },
+      sequence: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       createdAt: {
         type: DataTypes.DATE,
       },
